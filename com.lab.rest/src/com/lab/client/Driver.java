@@ -1,31 +1,47 @@
 package com.lab.client;
 
+import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-public class JerseyClient2 {
+public class Driver {
 	private static final String url = "http://localhost:7001/com.lab.rest/api";
-	public static void main(String[] args) {
-		JerseyClient2 jerseyclient = new JerseyClient2();
-		// jerseyclient.ClientGet();
-		// jerseyclient.ClientPost();
-		jerseyclient.ClientInsert(2, "new balance");
-		jerseyclient.ClientVerify(2);
-
+	public static void main(String args[]) {
+		Driver dr = new Driver();
+		SampleClient c1 = new SampleClient(1, "Apple");
+		SampleClient c2 = new SampleClient(2, "Orange");
+		SampleClient c3 = new SampleClient(3, "Peach");
+		
+		dr.ClientInsert(c1);
+		dr.ClientInsert(c2);
+		dr.ClientInsert(c3);
+		
+		while(true) {
+			try {
+				Thread.sleep(4000);
+				dr.ClientVerify(c1);
+				Thread.sleep(4000);
+				dr.ClientVerify(c2);
+				Thread.sleep(4000);
+				dr.ClientVerify(c3);
+			} catch (InterruptedException e) {
+				System.out.println("thread error");
+			}
+		}
 	}
-
-	public void ClientInsert(int id, String data) {
+	
+	public void ClientInsert(SampleClient c) {
 		Client client = Client.create();
-		WebResource webResource = client.resource(url + "/v1/status/insert");
+		WebResource webResource = client.resource(url + "/v1/insert");
 		JSONObject jsonobject = new JSONObject();
 		try {
-			jsonobject.put("id", id);
-			jsonobject.put("data", data);
+			jsonobject.put("id", c.getID());
+			jsonobject.put("data", c.getData());
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 
 		ClientResponse response = webResource.type("application/json").post(ClientResponse.class,
@@ -41,12 +57,12 @@ public class JerseyClient2 {
 		System.out.println(output);
 	}
 	
-	public void ClientVerify(int id) {
+	public void ClientVerify(SampleClient c) {
 		Client client = Client.create();
-		WebResource webResource = client.resource(url + "/v1/status/verify");
+		WebResource webResource = client.resource(url + "/v1/verify");
 		JSONObject jsonobject = new JSONObject();
 		try {
-			jsonobject.put("id", id);
+			jsonobject.put("id", c.getID());
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -60,9 +76,17 @@ public class JerseyClient2 {
 		}
 
 		String output = response.getEntity(String.class);
-		System.out.println("verify");
-		System.out.println("Output from Server .... \n");
-		System.out.println(output);
+		JSONObject jsonobj;
+		try {
+			jsonobj = new JSONObject(output);
+			System.out.println("verify");
+			System.out.println("Output from Server .... \n");
+			System.out.println(jsonobj.opt("data").toString());
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	public void ClientGet() {
@@ -70,7 +94,7 @@ public class JerseyClient2 {
 
 			Client client = Client.create();
 
-			WebResource webResource = client.resource(url + "/v1/status/ping/get");
+			WebResource webResource = client.resource(url + "/v1/ping/get");
 
 			ClientResponse response = webResource.accept("application/json").get(ClientResponse.class);
 
@@ -96,7 +120,7 @@ public class JerseyClient2 {
 
 			Client client = Client.create();
 
-			WebResource webResource = client.resource(url + "/v1/status/ping/post");
+			WebResource webResource = client.resource(url + "/v1/ping/post");
 
 			String input = "{\"singer\":\"Metallica\",\"title\":\"Fade To Black\"}";
 
@@ -115,5 +139,5 @@ public class JerseyClient2 {
 			e.printStackTrace();
 
 		}
-	}
+	} 
 }

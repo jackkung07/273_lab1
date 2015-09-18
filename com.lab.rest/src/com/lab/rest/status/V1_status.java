@@ -8,7 +8,7 @@ import javax.ws.rs.core.*;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 
-@Path("/v1/status") // removed * wildcard to make this more compatible with
+@Path("/v1") // removed * wildcard to make this more compatible with
 					// tomcat
 public class V1_status {
 	
@@ -33,6 +33,7 @@ public class V1_status {
 	 * 
 	 * @return String - Title of the api
 	 */
+	@Path("/status")
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public String returnTitle() {
@@ -95,10 +96,12 @@ public class V1_status {
 	public Response addItem(String incomingData) {
 		
 		boolean item = false;
+		int id = -1;
+		String data = "";
 		try {
 			JSONObject jsonObject = new JSONObject(incomingData);
-			int id = jsonObject.optInt("id");
-			String data = jsonObject.optString("data");
+			id = jsonObject.optInt("id");
+			data = jsonObject.optString("data");
 			
 			item = dao.insertItems(id, data);
 			
@@ -107,7 +110,7 @@ public class V1_status {
 			e.printStackTrace();
 		}
 		if (item == true) {
-			return Response.ok("insert successful").build();
+			return Response.ok("insert successful" + id + " " + data).build();
 		}
 		return Response.serverError().build();
 	}
