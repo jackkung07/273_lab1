@@ -3,7 +3,7 @@ package com.lab.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Schemalab {
+public class Schema {
 	private static List<Items> list = new ArrayList<Items>();
 	
 	public boolean insertItems(int id, String data){
@@ -20,6 +20,26 @@ public class Schemalab {
 			inventory += "<p>id: " + list.get(i).CLIENT_ID + " data: " + list.get(i).CLIENT_DATA + "</p>";
 		}
 		return inventory;
+	}
+	
+	public boolean verifyID(int id) {
+		
+		for(int i = 0; i < list.size(); i++) {
+			if(list.get(i).CLIENT_ID == id) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public String getData(int id) {
+		String data = "";
+		for(int i = 0; i < list.size(); i++) {
+			if(list.get(i).CLIENT_ID == id) {
+				data = list.get(i).CLIENT_DATA + " ";
+			}
+		}
+		return data;
 	}
 	
 	

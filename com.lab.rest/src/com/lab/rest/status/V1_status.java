@@ -11,9 +11,22 @@ import org.codehaus.jettison.json.JSONObject;
 @Path("/v1/status") // removed * wildcard to make this more compatible with
 					// tomcat
 public class V1_status {
-
+	
 	private static final String api_version = "00.01.00"; // version of the api
-	private static Schemalab dao = new Schemalab();
+	private static Schema dao = new Schema();
+	
+	@Path("/initialize")
+	@GET
+	@Produces(MediaType.TEXT_HTML)
+	public String returnDBStatus() {
+		dao.insertItems(0, "apple");
+		dao.insertItems(1, "oracle");
+		dao.insertItems(2, "ibm");
+	
+		return "<p> initialized </p>";
+	}
+		
+	
 	/**
 	 * This method sits at the root of the api. It will return the name of this
 	 * api.
@@ -94,10 +107,42 @@ public class V1_status {
 			e.printStackTrace();
 		}
 		if (item == true) {
-			return Response.ok(incomingData).build();
+			return Response.ok("insert successful").build();
 		}
 		return Response.serverError().build();
 	}
+	
+	@Path("/verify")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response verifyItem(String incomingData) {
+		
+		boolean verify = false;
+		int id = -1;
+		String data = "";
+		Response rb = null;
+		try {
+			JSONObject jsonObject = new JSONObject(incomingData);
+			id = jsonObject.optInt("id");
+			verify = dao.verifyID(id);
+			if (verify == true) {
+				data = dao.getData(id);
+				data = "Server has your id: " + id + " and data is " + data;
+				JSONObject jb = new JSONObject();
+				jb.put("status", "success");
+				jb.put("id", id);
+				jb.put("data", data);
+				System.out.println("server verify item success");
+				return rb.ok(jb.toString()).build();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return rb.serverError().build();
+	}
+	
 	@Path("/inventory")
 	@GET
 	@Produces(MediaType.TEXT_HTML)
