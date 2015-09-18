@@ -7,32 +7,49 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
-public class Driver {
+public class Driver extends Thread {
 	private static final String url = "http://localhost:7001/com.lab.rest/api";
-	public static void main(String args[]) {
-		Driver dr = new Driver();
-		SampleClient c1 = new SampleClient(1, "Apple");
-		SampleClient c2 = new SampleClient(2, "Orange");
-		SampleClient c3 = new SampleClient(3, "Peach");
-		
-		dr.ClientInsert(c1);
-		dr.ClientInsert(c2);
-		dr.ClientInsert(c3);
-		
-		while(true) {
+	private Thread t;
+	private SampleClient c;
+
+	public Driver(int id, String data) {
+		c = new SampleClient(id, data);
+		this.ClientInsert(c);
+	}
+
+	public void run() {
+		while (true) {
 			try {
-				Thread.sleep(4000);
-				dr.ClientVerify(c1);
-				Thread.sleep(4000);
-				dr.ClientVerify(c2);
-				Thread.sleep(4000);
-				dr.ClientVerify(c3);
+				Thread.sleep(2000);
+				this.ClientVerify(c);
 			} catch (InterruptedException e) {
 				System.out.println("thread error");
 			}
 		}
+
 	}
-	
+
+	public void start() {
+		
+		if (t == null) {
+			t = new Thread(this);
+			t.start();
+		}
+	}
+
+	public static void main(String args[]) {
+		Driver dr1 = new Driver(1, "Apple");
+
+		Driver dr2 = new Driver(2, "Orange");
+
+		Driver dr3 = new Driver(3, "Peach");
+		
+		dr1.start();
+		dr2.start();
+		dr3.start();
+
+	}
+
 	public void ClientInsert(SampleClient c) {
 		Client client = Client.create();
 		WebResource webResource = client.resource(url + "/v1/insert");
@@ -41,7 +58,7 @@ public class Driver {
 			jsonobject.put("id", c.getID());
 			jsonobject.put("data", c.getData());
 		} catch (Exception e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 
 		ClientResponse response = webResource.type("application/json").post(ClientResponse.class,
@@ -53,17 +70,16 @@ public class Driver {
 
 		String output = response.getEntity(String.class);
 		System.out.println("insert");
-		System.out.println("Output from Server .... \n");
-		System.out.println(output);
+		System.out.println("Output from Server .... " + output);
 	}
-	
+
 	public void ClientVerify(SampleClient c) {
 		Client client = Client.create();
 		WebResource webResource = client.resource(url + "/v1/verify");
 		JSONObject jsonobject = new JSONObject();
 		try {
 			jsonobject.put("id", c.getID());
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -79,14 +95,14 @@ public class Driver {
 		JSONObject jsonobj;
 		try {
 			jsonobj = new JSONObject(output);
-			System.out.println("verify");
-			System.out.println("Output from Server .... \n");
+
+			System.out.println("\n\nverify");
+			System.out.println("Response from Server .... ");
 			System.out.println(jsonobj.opt("data").toString());
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("json error");
 		}
-		
+
 	}
 
 	public void ClientGet() {
@@ -139,5 +155,5 @@ public class Driver {
 			e.printStackTrace();
 
 		}
-	} 
+	}
 }
