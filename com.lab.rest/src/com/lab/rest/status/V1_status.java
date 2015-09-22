@@ -138,6 +138,15 @@ public class V1_status {
 				jb.put("data", data);
 				System.out.println("server verify item success");
 				return rb.ok(jb.toString()).build();
+			} else {
+				data = "";
+				data = "Server doesn't have your id: " + id + " and data is null";
+				JSONObject jb = new JSONObject();
+				jb.put("status", "success");
+				jb.put("id", id);
+				jb.put("data", data);
+				System.out.println("server verify item failed");
+				return rb.ok(jb.toString()).build();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

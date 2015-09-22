@@ -1,5 +1,7 @@
 package com.lab.client;
 
+import java.util.Scanner;
+
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -15,6 +17,10 @@ public class Driver extends Thread {
 	public Driver(int id, String data) {
 		c = new SampleClient(id, data);
 		this.ClientInsert(c);
+	}
+	
+	public Driver(int id) {
+		c = new SampleClient(id, "abc");
 	}
 
 	public void run() {
@@ -39,14 +45,18 @@ public class Driver extends Thread {
 
 	public static void main(String args[]) {
 		Driver dr1 = new Driver(1, "Apple");
-
+		Driver dr11 = new Driver(1, "Banana");
+		
 		Driver dr2 = new Driver(2, "Orange");
 
 		Driver dr3 = new Driver(3, "Peach");
 		
+		Driver dr4 = new Driver (4);
+		
 		dr1.start();
 		dr2.start();
 		dr3.start();
+		dr4.start();
 
 	}
 

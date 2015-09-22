@@ -36,7 +36,7 @@ public class Schema {
 		String data = "";
 		for(int i = 0; i < list.size(); i++) {
 			if(list.get(i).CLIENT_ID == id) {
-				data = list.get(i).CLIENT_DATA + " ";
+				data = list.get(i).CLIENT_DATA;
 			}
 		}
 		return data;
